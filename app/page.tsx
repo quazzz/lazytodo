@@ -1,103 +1,123 @@
-import Image from "next/image";
-
+"use client";
+import Card from "@/components/card";
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import { CheckIcon } from "lucide-react";
+type Task = {
+  task: string;
+  scheldule: string;
+  uniqueId: any;
+  description: string;
+};
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [task, setTask] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [scheldule, setScheldule] = useState("");
+  useEffect(() => {
+    const tasks = localStorage.getItem("tasks");
+    if (tasks) {
+      setTasks(JSON.parse(tasks));
+    }
+  }, []);
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+  const submit = () => {
+    if (!task || !description || !scheldule) {
+      toast.error("all fields must be filled");
+      return;
+    }
+    setTasks((prev) => [
+      ...prev,
+      { task, scheldule, uniqueId: Date.now(), description },
+    ]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    setTask("");
+    setDescription("");
+    setScheldule("");
+    toast.success("added succefully");
+  };
+  const deleteTask = (id: any) => {
+    const newTasks = tasks.filter((task) => task.uniqueId != id);
+    setTasks(newTasks);
+    toast.success("deleted succefully");
+  };
+  return (
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-black p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] text-violet-200">
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <svg
+          className="absolute inset-0 w-full h-full opacity-10"
+          width="100%"
+          height="100%"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <pattern
+              id="grid"
+              width="80"
+              height="80"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 80 0 L 0 0 0 80"
+                fill="none"
+                stroke="rgba(255, 255, 255, 0.97)"
+                strokeWidth="1"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </div>
+      <div className="form z-10 bg-black bg-opacity-70 p-6 rounded-lg border border-violet-500 shadow-lg flex flex-col gap-4 w-full max-w-2xl mt-[100px]">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <input
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+            className="bg-gray-800 text-violet-100 border border-violet-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder-violet-300 placeholder-opacity-50 flex-1"
+            type="text"
+            placeholder="enter task..."
+          />
+          <input
+            value={scheldule}
+            onChange={(e) => setScheldule(e.target.value)}
+            className="bg-gray-800 text-violet-100 border border-violet-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500 w-full sm:w-auto"
+            type="time"
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <input
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="bg-gray-800 text-violet-100 border border-violet-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder-violet-300 placeholder-opacity-50 w-full"
+          type="text"
+          placeholder="enter description..."
+        />
+        <button
+          onClick={submit}
+          className="cursor-pointer bg-violet-700 hover:bg-violet-600 text-white font-medium rounded-md px-4 py-2 transition-colors duration-200 focus:ring-2 focus:ring-violet-400 focus:outline-none shadow-md hover:shadow-violet-500/30 self-end"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <CheckIcon size={18} />
+        </button>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-6xl z-10">
+        {tasks.length > 0 && tasks ? (
+          tasks.map((task, idx) => (
+            <Card
+              name={task.task}
+              key={idx}
+              id={task.uniqueId}
+              scheldule={task.scheldule}
+              onDelete={deleteTask}
+              desc={task.description}
+            />
+          ))
+        ) : (
+          <div className="text-violet-300 opacity-70 col-span-full text-center text-lg italic">
+            no tasks
+          </div>
+        )}
+      </div>
     </div>
   );
 }
