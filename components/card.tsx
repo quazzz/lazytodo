@@ -1,8 +1,14 @@
 'use client'
 import { Trash2, CheckIcon } from "lucide-react";
-import clsx from "clsx";
 import { useState } from "react";
-export default function Card({ name, scheldule, onDelete, id, desc }) {
+type Card = {
+  name: string;
+  scheldule: string;
+  onDelete: (id: string) => void;
+  id: string;
+  desc: string;
+}
+export default function Card({ name, scheldule, onDelete, id, desc }: Card) {
   const [checked,setChecked] = useState(false);
   return (
     <div className="bg-black bg-opacity-95 border border-violet-500 rounded-lg p-5 shadow-lg transition-all duration-300">
